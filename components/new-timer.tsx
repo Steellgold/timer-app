@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactElement, useState } from "react";
+import { PropsWithChildren, ReactElement, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Drawer,
@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { cn, numberFormat } from "@/lib/utils";
 import { useTimers } from "@/lib/stores/timers.store";
 import { dayJS } from "@/lib/dayjs/day-js";
+import { Component } from "./ui/component";
 
 const inputStyles = cn(
   "w-20 h-16",
@@ -26,7 +27,9 @@ const inputStyles = cn(
   "rounded-md text-center text-5xl focus:text-accent-content focus:outline-none md:text-6xl lg:text-7xl"
 );
 
-export const NewTimerDrawer = (): ReactElement => {
+export const NewTimerDrawer: Component<PropsWithChildren & {
+  isCard?: boolean;
+}> = ({ children = null, isCard = false }): ReactElement => {
   const { timers, createTimer } = useTimers();
 
   const [hours, setHours] = useState<string>("00");
@@ -43,7 +46,9 @@ export const NewTimerDrawer = (): ReactElement => {
       setTimerName("");
     }}>
       <DrawerTrigger asChild>
-        <Button>Create Timer</Button>
+        {isCard ? children : (
+          <Button>Create Timer</Button>
+        )}
       </DrawerTrigger>
       
       <DrawerContent>
@@ -84,7 +89,7 @@ export const NewTimerDrawer = (): ReactElement => {
                 startedAt.setSeconds(+seconds);
 
                 createTimer({
-                  id: timers.length + 1,
+                  id: Math.random().toString(36).substr(2, 9),
                   name: timerName,
                   position: timers.length + 1,
                   startedAt: dayJS(),
@@ -93,6 +98,7 @@ export const NewTimerDrawer = (): ReactElement => {
                   isPaused: false,
                   backgroundImage: null,
                   pinned: false,
+                  elapsed: 0,
                 });
 
                 setHours("00");
