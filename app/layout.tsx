@@ -7,7 +7,6 @@ import { ThemeProvider } from "@/lib/theme-provider";
 import { cn } from "@/lib/utils";
 import { ThemeSwitcher } from "@/components/ui/theme-switcher";
 import { CurrentTime } from "@/components/local-time";
-import { NewTimerDrawer } from "@/components/new-timer";
 
 const nunito = Nunito({ subsets: ["latin"] });
 
@@ -31,8 +30,6 @@ const RootLayout: Component<PropsWithChildren> = ({ children }) => {
           
           <div className={cn(
             "p-4 m-4 rounded-lg",
-            "border border-dashed border-[#201f1f1c] dark:border-[#f7f1eb1c] border-[3px]",
-            "sm:h-[calc(98vh-4rem)] h-[calc(100vh-4rem)] overflow-y-auto"
           )}>
             {children}
           </div>
