@@ -4,8 +4,13 @@ import { persist } from "zustand/middleware";
 
 type Timer = {
   id: number;
+  name: string;
+  position: number;
+
   startedAt: Dayjs;
   endedAt: Dayjs;
+  isPaused: boolean;
+
   endSong: "default" | string;
   backgroundImage: null | string;
   pinned: boolean;
@@ -13,8 +18,12 @@ type Timer = {
 
 type TimersStore = {
   timers: Timer[];
+  
   createTimer: (timer: Timer) => void;
   deleteTimer: (id: number) => void;
+
+  togglePaused: (id: number) => void;
+
   togglePinned: (id: number) => void;
   setEndSong: (id: number, song: "default" | string) => void;
   setBackgroundImage: (id: number, url: null | string) => void;
@@ -39,6 +48,11 @@ export const useTimers = create(persist<TimersStore>(
     
     deleteTimer: (id) => 
       set((state) => ({ timers: state.timers.filter((timer) => timer.id !== id) })),
+
+    togglePaused: (id) =>
+      set((state) => ({ 
+        timers: updateTimer(state, id, { isPaused: !state.timers.find((timer) => timer.id === id)?.isPaused })
+      })),
     
     togglePinned: (id) => 
       set((state) => ({ 
