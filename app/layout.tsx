@@ -21,7 +21,7 @@ const RootLayout: Component<PropsWithChildren> = ({ children }) => {
       <ThemeProvider defaultTheme="dark" attribute="class" enableSystem disableTransitionOnChange>
         <body className={cn(
           nunito.className,
-          "bg-[#ffffff] dark:bg-[#000000] text-[#11181c] dark:text-[#ecedee] antialiased transition-colors duration-200 ease-in-out"
+          "bg-[#f7f1eb] dark:bg-[#201f1f] text-[#11181c] dark:text-[#ecedee] antialiased transition-colors duration-200 ease-in-out"
         )}>
           <ThemeSwitcher />
           <CurrentTime />
