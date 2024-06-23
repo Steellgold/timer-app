@@ -40,6 +40,7 @@ export const CurrentTime = () => {
       <PopoverContent className="p-4 space-y-2 ml-4">
         <div className="flex items-center space-x-2 w-full">
           <Toggle
+            variant={"outline"}
             className="w-full"
             pressed={showSeconds}
             onPressedChange={toggleSeconds}>
