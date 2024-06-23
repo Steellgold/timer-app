@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/lib/theme-provider";
 import { cn } from "@/lib/utils";
 import { ThemeSwitcher } from "@/components/ui/theme-switcher";
 import { CurrentTime } from "@/components/local-time";
+import { NewTimerDrawer } from "@/components/new-timer";
 
 const nunito = Nunito({ subsets: ["latin"] });
 
