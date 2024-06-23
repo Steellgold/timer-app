@@ -10,7 +10,7 @@ export function ThemeSwitcher() {
   const { setTheme, theme } = useTheme()
 
   return (
-    <Button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} className="fixed top-4 right-4 z-50">
+    <Button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
       {theme === "dark" ? <SunIcon size={16} /> : <MoonIcon size={16} />}&nbsp;
       Switch theme to {theme === "dark" ? "light" : "dark"}{" "}
     </Button>

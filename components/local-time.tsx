@@ -32,7 +32,7 @@ export const CurrentTime = () => {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button className="fixed top-4 left-4 z-50 flex items-center space-x-2">
+        <Button className="flex items-center space-x-2">
           <ClockByHour hour={hour12} />
           <span>{hour}:{minute}{showSeconds ? `:${second}` : ""}</span>
         </Button>

@@ -23,9 +23,18 @@ const RootLayout: Component<PropsWithChildren> = ({ children }) => {
           nunito.className,
           "bg-[#f7f1eb] dark:bg-[#201f1f] text-[#11181c] dark:text-[#ecedee] antialiased transition-colors duration-200 ease-in-out"
         )}>
-          <ThemeSwitcher />
-          <CurrentTime />
-          {children}
+          <div className="flex justify-between px-4 mt-4">
+            <CurrentTime />
+            <ThemeSwitcher />
+          </div>
+          
+          <div className={cn(
+            "p-4 m-4 rounded-lg",
+            "border border-dashed border-[#201f1f1c] dark:border-[#f7f1eb1c] border-[3px]",
+            "sm:h-[calc(98vh-4rem)] h-[calc(100vh-4rem)] overflow-y-auto"
+          )}>
+            {children}
+          </div>
         </body>
       </ThemeProvider>
     </html>
