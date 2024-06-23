@@ -5,9 +5,16 @@ import { Clock, Clock1, Clock10, Clock11, Clock12, Clock2, Clock3, Clock4, Clock
 import { useEffect, useState } from "react";
 import { Component } from "./ui/component";
 import { Button } from "./ui/button";
+import { useLocalTime } from "@/lib/stores/local-time.store";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Toggle } from "@/components/ui/toggle"
+import { Label } from "./ui/label";
+import { cn } from "@/lib/utils";
+
 
 export const CurrentTime = () => {
   const [time, setTime] = useState(new Date());
+  const { format, setFormat, showSeconds, toggleSeconds } = useLocalTime();
   
   useEffect(() => {
     const interval = setInterval(() => {
@@ -17,14 +24,34 @@ export const CurrentTime = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const hour = dayJS(time).format("hh");
+  const hour12 = dayJS(time).format("hh");
+  const hour = dayJS(time).format(format === 12 ? "hh" : "HH");
   const minute = dayJS(time).format("mm");
+  const second = dayJS(time).format("ss");
 
   return (
-    <Button className="fixed top-4 left-4 z-50 flex items-center space-x-2">
-      <ClockByHour hour={hour} />
-      <span>{hour}:{minute}</span>
-    </Button>
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button className="fixed top-4 left-4 z-50 flex items-center space-x-2">
+          <ClockByHour hour={hour12} />
+          <span>{hour}:{minute}{showSeconds ? `:${second}` : ""}</span>
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="p-4 space-y-2 ml-4">
+        <div className="flex items-center space-x-2 w-full">
+          <Toggle
+            className="w-full"
+            pressed={showSeconds}
+            onPressedChange={toggleSeconds}>
+            Show seconds
+          </Toggle>
+        </div>
+        <div className="flex space-x-2 w-full">
+          <Button onClick={() => setFormat(12)} className={cn("w-full", format === 24 ? "bg-gray-200" : "")}>12-hour</Button>
+          <Button onClick={() => setFormat(24)} className={cn("w-full", format === 12 ? "bg-gray-200" : "")}>24-hour</Button>
+        </div>
+      </PopoverContent>
+    </Popover>
   );
 };
 
