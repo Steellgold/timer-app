@@ -4,28 +4,24 @@ import { Bell } from 'lucide-react';
 import { Component } from './ui/component';
 import { dayJS } from '@/lib/dayjs/day-js';
 import { cn } from '@/lib/utils';
-import { useTimers } from '@/lib/stores/timers.store';
+import { Timer as TimerType, useTimers } from '@/lib/stores/timers.store';
 
-export const CircleProgressTimer: Component<{
-  duration: number,
-  isPaused: boolean,
-  timerId: string
-}> = ({ duration, isPaused, timerId }) => {
-  const [timeLeft, setTimeLeft] = useState(duration);
+export const CircleProgressTimer: Component<{ timer: TimerType }> = ({ timer }) => {
+  const [timeLeft, setTimeLeft] = useState<number>((dayJS(timer.endedAt).diff(timer.startedAt, "seconds") - (timer.elapsed ?? 0)));
   const [percentage, setPercentage] = useState(100);
   const { addElapsed } = useTimers();
 
   useEffect(() => {
     if (timeLeft > 0) {
-      const timer = setTimeout(() => {
-        if (isPaused) return;
+      const timerTimeout = setTimeout(() => {
+        if (timer.isPaused) return;
         setTimeLeft(timeLeft - 1);
-        addElapsed(timerId, 1);
-        setPercentage((timeLeft - 1) / duration * 100);
+        addElapsed(timer.id, 1);
+        setPercentage((timeLeft - 1) / (dayJS(timer.endedAt).diff(timer.startedAt, "seconds")) * 100);
       }, 1000);
-      return () => clearTimeout(timer);
+      return () => clearTimeout(timerTimeout);
     }
-  }, [timeLeft, duration, isPaused, timerId, addElapsed]);
+  }, [timeLeft, addElapsed, timer]);
 
   const renderTimeLeft = () => {
     if (timeLeft > 3600) {
