@@ -97,6 +97,7 @@ export const NewTimerDrawer: Component<PropsWithChildren & {
                   endSong: "default",
                   isPaused: false,
                   isEnded: false,
+                  isFocused: false,
                   backgroundImage: null,
                   pinned: false,
                   elapsed: 0,
