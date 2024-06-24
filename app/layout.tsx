@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/lib/theme-provider";
 import { cn } from "@/lib/utils";
 import { ThemeSwitcher } from "@/components/ui/theme-switcher";
 import { CurrentTime } from "@/components/local-time";
+import { FocusMode } from "@/components/focus-mode";
 
 const nunito = Nunito({ subsets: ["latin"] });
 
@@ -23,16 +24,14 @@ const RootLayout: Component<PropsWithChildren> = ({ children }) => {
           nunito.className,
           "bg-[#f7f1eb] dark:bg-[#201f1f] text-[#11181c] dark:text-[#ecedee] antialiased transition-colors duration-200 ease-in-out"
         )}>
-          <div className="flex justify-between px-4 mt-4">
-            <CurrentTime />
-            <ThemeSwitcher />
-          </div>
-          
-          <div className={cn(
-            "p-4 m-4 rounded-lg",
-          )}>
-            {children}
-          </div>
+          <FocusMode>
+            <div className="flex justify-between px-4 mt-4">
+                <CurrentTime />
+                <ThemeSwitcher />
+              </div>
+              
+              <div className={cn("p-4")}>{children}</div>
+          </FocusMode>
         </body>
       </ThemeProvider>
     </html>
