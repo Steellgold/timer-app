@@ -5,12 +5,12 @@ import { NewTimerDrawer } from "@/components/new-timer";
 import { dayJS } from "@/lib/dayjs/day-js";
 import { useTimers } from "@/lib/stores/timers.store";
 import { cn } from "@/lib/utils";
-import { Pause, Pin, PinOff, Play, Plus, X } from "lucide-react";
+import { Pause, Pin, PinOff, Play, Plus, Scan, X } from "lucide-react";
 import { useEffect } from "react";
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 
 export default function Home() {
-  const { timers, deleteTimer, togglePaused, togglePinned, checkElapseds, updatePosition, setOriginalPosition } = useTimers();
+  const { timers, deleteTimer, togglePaused, togglePinned, checkElapseds, updatePosition, setOriginalPosition, toggleFocused } = useTimers();
 
   useEffect(() => {
     checkElapseds();
@@ -23,7 +23,6 @@ export default function Home() {
     const movedTimer = timers[source.index];
 
     if (movedTimer.pinned) return;
-
     if (destination.index === 0 && timers.some(timer => timer.pinned)) return;
 
     updatePosition(movedTimer.id, destination.index);
@@ -59,27 +58,41 @@ export default function Home() {
                     {...(timer.pinned ? {} : provided.dragHandleProps)}
                     className="bg-[#d1ccc7] dark:bg-[#131212] border border-[#201f1f1c] rounded-xl p-4 sm:w-[200px]"
                   >
-                    <div className="flex justify-between flex-row-reverse">
+                    <div className="flex justify-between flex-row-reverse h-8 w-full">
+                      <Scan
+                        fill="currentColor"
+                        size={30}
+                        onClick={() => toggleFocused(timer.id)}
+                        className={cn(
+                          "cursor-pointer rounded-full p-1.5 text-primary-foreground",
+                          "dark:text-[#fde047] bg-[#fde047] dark:bg-[#201f1f] text-[#201f1f]",
+                          "hover:bg-[#fde047] dark:hover:bg-[#201f1f]"
+                        )}
+                      />
                       {!timer.pinned ? (
-                        <Pin
-                          fill="currentColor"
-                          size={30}
-                          onClick={() => {
-                            if (timers.every((t) => !t.pinned)) {
-                              togglePinned(timer.id);
-                              setOriginalPosition(timer.id, timer.position);
-                              updatePosition(timer.id, 0);
-                            }
-                          }}
-                          className={cn(
-                            "cursor-pointer rounded-full p-1.5 text-primary-foreground", {
-                              "dark:text-blue-900 bg-blue-100 dark:bg-blue-400": timers.every((t) => !t.pinned),
-                              "hover:bg-blue-200 dark:hover:bg-blue-300": timers.every((t) => !t.pinned),
-                              "dark:text-gray-900 bg-gray-100 dark:bg-gray-400": timers.some((t) => t.pinned),
-                              "hover:bg-gray-200 dark:hover:bg-gray-300": timers.some((t) => t.pinned)
-                            }
+                        <>
+                          {timers.some(timer => timer.pinned) ? <></> : (
+                            <Pin
+                              fill="currentColor"
+                              size={30}
+                              onClick={() => {
+                                if (timers.every((t) => !t.pinned)) {
+                                  togglePinned(timer.id);
+                                  setOriginalPosition(timer.id, timer.position);
+                                  updatePosition(timer.id, 0);
+                                }
+                              }}
+                              className={cn(
+                                "cursor-pointer rounded-full p-1.5 text-primary-foreground", {
+                                  "dark:text-blue-900 bg-blue-100 dark:bg-blue-400": timers.every((t) => !t.pinned),
+                                  "hover:bg-blue-200 dark:hover:bg-blue-300": timers.every((t) => !t.pinned),
+                                  "dark:text-gray-900 bg-gray-100 dark:bg-gray-400": timers.some((t) => t.pinned),
+                                  "hover:bg-gray-200 dark:hover:bg-gray-300": timers.some((t) => t.pinned)
+                                }
+                              )}
+                            />
                           )}
-                        />
+                        </>
                       ) : (
                         <PinOff
                           fill="currentColor" size={30}
@@ -98,9 +111,10 @@ export default function Home() {
                     </div>
 
                     <div className="flex justify-center items-center">
-                      <CircleProgressTimer duration={
+                      {/* <CircleProgressTimer duration={
                         (dayJS(timer.endedAt).diff(timer.startedAt, "seconds") - (timer.elapsed ?? 0))
-                      } isPaused={timer.isPaused} timerId={timer.id} />
+                      } isPaused={timer.isPaused} timerId={timer.id} /> */}
+                      <CircleProgressTimer timer={timer} />
                     </div>
 
                     <div className="flex justify-between">
