@@ -10,7 +10,7 @@ import { useEffect } from "react";
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 
 export default function Home() {
-  const { timers, deleteTimer, togglePaused, togglePinned, checkElapseds, updatePosition } = useTimers();
+  const { timers, deleteTimer, togglePaused, togglePinned, checkElapseds, updatePosition, setOriginalPosition } = useTimers();
 
   useEffect(() => {
     checkElapseds();
@@ -21,6 +21,14 @@ export default function Home() {
 
     const { source, destination } = result;
     const movedTimer = timers[source.index];
+
+    // Ne pas déplacer le timer épinglé
+    if (movedTimer.pinned) return;
+
+    // Si destination est 0, on ne déplace pas si un timer est épinglé
+    if (destination.index === 0 && timers.some(timer => timer.pinned)) return;
+
+    // Si destination est 0, et qu'il n'y a pas de timer épinglé, déplacer normalement
     updatePosition(movedTimer.id, destination.index);
   };
 
@@ -46,36 +54,43 @@ export default function Home() {
             ref={provided.innerRef}
           >
             {sortedTimers.map((timer, index) => (
-              <Draggable key={timer.id} draggableId={timer.id.toString()} index={index}>
+              <Draggable key={timer.id} draggableId={timer.id.toString()} index={index} isDragDisabled={timer.pinned}>
                 {(provided) => (
                   <div
                     ref={provided.innerRef}
                     {...provided.draggableProps}
-                    {...provided.dragHandleProps}
+                    {...(timer.pinned ? {} : provided.dragHandleProps)}
                     className="bg-[#d1ccc7] dark:bg-[#131212] border border-[#201f1f1c] rounded-xl p-4 sm:w-[200px]"
                   >
                     <div className="flex justify-between flex-row-reverse">
-                      <p>
-                        {timer.name}
-                      </p>
                       {!timer.pinned ? (
                         <Pin
                           fill="currentColor"
                           size={30}
-                          onClick={() => timers.every((timer) => !timer.pinned) ? togglePinned(timer.id) : null}
+                          onClick={() => {
+                            if (timers.every((t) => !t.pinned)) {
+                              togglePinned(timer.id);
+                              setOriginalPosition(timer.id, timer.position);
+                              updatePosition(timer.id, 0);
+                            }
+                          }}
                           className={cn(
                             "cursor-pointer rounded-full p-1.5 text-primary-foreground", {
-                              "dark:text-blue-900 bg-blue-100 dark:bg-blue-400": timers.every((timer) => !timer.pinned),
-                              "hover:bg-blue-200 dark:hover:bg-blue-300": timers.every((timer) => !timer.pinned),
-                              "dark:text-gray-900 bg-gray-100 dark:bg-gray-400": timers.some((timer) => timer.pinned),
-                              "hover:bg-gray-200 dark:hover:bg-gray-300": timers.some((timer) => timer.pinned)
+                              "dark:text-blue-900 bg-blue-100 dark:bg-blue-400": timers.every((t) => !t.pinned),
+                              "hover:bg-blue-200 dark:hover:bg-blue-300": timers.every((t) => !t.pinned),
+                              "dark:text-gray-900 bg-gray-100 dark:bg-gray-400": timers.some((t) => t.pinned),
+                              "hover:bg-gray-200 dark:hover:bg-gray-300": timers.some((t) => t.pinned)
                             }
                           )}
                         />
                       ) : (
                         <PinOff
                           fill="currentColor" size={30}
-                          onClick={() => togglePinned(timer.id)}
+                          onClick={() => {
+                            togglePinned(timer.id);
+                            const originalPosition = timer.originalPosition ?? timer.position;
+                            updatePosition(timer.id, originalPosition);
+                          }}
                           className={cn(
                             "cursor-pointer rounded-full p-1.5 text-primary-foreground",
                             "dark:text-blue-900 bg-blue-100 dark:bg-blue-400",

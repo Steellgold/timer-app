@@ -6,7 +6,9 @@ import { dayJS } from "../dayjs/day-js";
 type Timer = {
   id: string;
   name: string;
+
   position: number;
+  originalPosition?: number;
 
   elapsed: number;
 
@@ -16,6 +18,7 @@ type Timer = {
 
   endSong: "default" | string;
   backgroundImage: null | string;
+  
   pinned: boolean;
 };
 
@@ -36,6 +39,7 @@ type TimersStore = {
   checkElapseds: () => void;
 
   updatePosition: (id: string, position: number) => void;
+  setOriginalPosition: (id: string, position: number) => void;
 };
 
 const updateTimer = (
@@ -124,7 +128,12 @@ export const useTimers = create(persist<TimersStore>(
           updatedTimers.splice(newPosition, 0, timerToMove);
       
           return { timers: updatedTimers };
-        })
+        }),
+        setOriginalPosition: (id, position) =>
+          set((state) => ({
+            timers: updateTimer(state, id, { originalPosition: position })
+          })
+        ),
   }),
   { name: "timers" }
 ));
