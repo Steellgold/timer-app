@@ -96,6 +96,7 @@ export const NewTimerDrawer: Component<PropsWithChildren & {
                   endedAt: dayJS().add(+hours, "hours").add(+minutes, "minutes").add(+seconds, "seconds"),
                   endSong: "default",
                   isPaused: false,
+                  isEnded: false,
                   backgroundImage: null,
                   pinned: false,
                   elapsed: 0,

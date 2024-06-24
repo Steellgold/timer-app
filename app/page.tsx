@@ -22,13 +22,10 @@ export default function Home() {
     const { source, destination } = result;
     const movedTimer = timers[source.index];
 
-    // Ne pas déplacer le timer épinglé
     if (movedTimer.pinned) return;
 
-    // Si destination est 0, on ne déplace pas si un timer est épinglé
     if (destination.index === 0 && timers.some(timer => timer.pinned)) return;
 
-    // Si destination est 0, et qu'il n'y a pas de timer épinglé, déplacer normalement
     updatePosition(movedTimer.id, destination.index);
   };
 
