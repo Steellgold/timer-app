@@ -14,7 +14,9 @@ type Timer = {
 
   startedAt: Dayjs;
   endedAt: Dayjs;
+
   isPaused: boolean;
+  isEnded: boolean;
 
   endSong: "default" | string;
   backgroundImage: null | string;
@@ -40,6 +42,8 @@ type TimersStore = {
 
   updatePosition: (id: string, position: number) => void;
   setOriginalPosition: (id: string, position: number) => void;
+
+  endTimer: (id: string) => void;
 };
 
 const updateTimer = (
@@ -68,9 +72,23 @@ export const useTimers = create(persist<TimersStore>(
       })),
 
     togglePaused: (id) =>
-      set((state) => ({ 
-        timers: updateTimer(state, id, { isPaused: !state.timers.find((timer) => timer.id === id)?.isPaused })
-      })),
+      set((state) => {
+        const timer = state.timers.find((timer) => timer.id === id);
+        if (!timer) return { timers: state.timers };
+
+        if (timer.isPaused) {
+          // Recalculer le temps de fin
+          const pausedDuration = dayJS().diff(timer.startedAt, "seconds") - timer.elapsed;
+          const newEndedAt = timer.endedAt.add(pausedDuration, "seconds");
+          return { 
+            timers: updateTimer(state, id, { isPaused: false, endedAt: newEndedAt }) 
+          };
+        } else {
+          return { 
+            timers: updateTimer(state, id, { isPaused: true, startedAt: dayJS() }) 
+          };
+        }
+      }),
     
     togglePinned: (id) => 
       set((state) => ({ 
@@ -92,7 +110,8 @@ export const useTimers = create(persist<TimersStore>(
         timers: state.timers.map((timer) => {
           if (timer.isPaused) return timer;
           const elapsed = dayJS().diff(timer.startedAt, "seconds");
-          return { ...timer, elapsed };
+          const isEnded = elapsed >= timer.elapsed;
+          return { ...timer, elapsed, isEnded };
         })
       })),
 
@@ -101,12 +120,9 @@ export const useTimers = create(persist<TimersStore>(
           const timerToMove = state.timers.find(timer => timer.id === id);
           if (!timerToMove) return { timers: state.timers };
       
-          // Supprime le timer de sa position actuelle
           let updatedTimers = state.timers.filter(timer => timer.id !== id);
       
-          // Ajuste les positions des autres timers
           if (timerToMove.position < newPosition) {
-            // Si on déplace vers l'avant
             updatedTimers = updatedTimers.map(timer => {
               if (timer.position > timerToMove.position && timer.position <= newPosition) {
                 return { ...timer, position: timer.position - 1 };
@@ -114,7 +130,6 @@ export const useTimers = create(persist<TimersStore>(
               return timer;
             });
           } else {
-            // Si on déplace vers l'arrière
             updatedTimers = updatedTimers.map(timer => {
               if (timer.position < timerToMove.position && timer.position >= newPosition) {
                 return { ...timer, position: timer.position + 1 };
@@ -123,7 +138,6 @@ export const useTimers = create(persist<TimersStore>(
             });
           }
       
-          // Insère le timer déplacé à sa nouvelle position
           timerToMove.position = newPosition;
           updatedTimers.splice(newPosition, 0, timerToMove);
       
@@ -134,6 +148,11 @@ export const useTimers = create(persist<TimersStore>(
             timers: updateTimer(state, id, { originalPosition: position })
           })
         ),
+        endTimer: (id) =>
+          set((state) => ({
+            timers: updateTimer(state, id, { isEnded: true })
+          })
+        )
   }),
   { name: "timers" }
 ));
