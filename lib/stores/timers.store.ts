@@ -3,7 +3,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { dayJS } from "../dayjs/day-js";
 
-type Timer = {
+export type Timer = {
   id: string;
   name: string;
 
@@ -17,6 +17,7 @@ type Timer = {
 
   isPaused: boolean;
   isEnded: boolean;
+  isFocused: boolean;
 
   endSong: "default" | string;
   backgroundImage: null | string;
@@ -33,8 +34,11 @@ type TimersStore = {
   addElapsed: (id: string, elapsed: number) => void;
 
   togglePaused: (id: string) => void;
-
   togglePinned: (id: string) => void;
+
+  toggleFocused: (id: string) => void;
+  removeFocusMode: () => void;
+  
   setEndSong: (id: string, song: "default" | string) => void;
   setBackgroundImage: (id: string, url: null | string) => void;
 
@@ -72,29 +76,32 @@ export const useTimers = create(persist<TimersStore>(
       })),
 
     togglePaused: (id) =>
-      set((state) => {
-        const timer = state.timers.find((timer) => timer.id === id);
-        if (!timer) return { timers: state.timers };
-
-        if (timer.isPaused) {
-          // Recalculer le temps de fin
-          const pausedDuration = dayJS().diff(timer.startedAt, "seconds") - timer.elapsed;
-          const newEndedAt = timer.endedAt.add(pausedDuration, "seconds");
-          return { 
-            timers: updateTimer(state, id, { isPaused: false, endedAt: newEndedAt }) 
-          };
-        } else {
-          return { 
-            timers: updateTimer(state, id, { isPaused: true, startedAt: dayJS() }) 
-          };
-        }
-      }),
+      set((state) => ({ 
+        timers: updateTimer(state, id, { isPaused: !state.timers.find((timer) => timer.id === id)?.isPaused })
+      })),
     
     togglePinned: (id) => 
       set((state) => ({ 
         timers: updateTimer(state, id, { pinned: !state.timers.find((timer) => timer.id === id)?.pinned })
       })),
-    
+
+    toggleFocused: (id) =>
+      set((state) => ({ 
+        timers: updateTimer(state, id, { isFocused: !state.timers.find((timer) => timer.id === id)?.isFocused })
+      })),
+   
+    removeFocusMode: () =>
+      set((state) => {
+        const focusedTimer = state.timers.find(timer => timer.isFocused);
+        if (focusedTimer) {
+          return {
+            timers: updateTimer(state, focusedTimer.id, { isFocused: false })
+          };
+        }
+        
+        return { timers: state.timers };
+      }),
+
     setEndSong: (id, song) => 
       set((state) => ({ 
         timers: updateTimer(state, id, { endSong: song }) 
