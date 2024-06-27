@@ -3,18 +3,15 @@
 import { CircleProgressTimer } from "@/components/circle";
 import { NewTimerDrawer } from "@/components/new-timer";
 import { dayJS } from "@/lib/dayjs/day-js";
-import { useTimers } from "@/lib/stores/timers.store";
 import { cn } from "@/lib/utils";
 import { Pause, Pin, PinOff, Play, Plus, Scan, X } from "lucide-react";
 import { useEffect } from "react";
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { useTimers } from "@/lib/stores/timers.store";
+import { TimerCard } from "@/components/card";
 
 export default function Home() {
-  const { timers, deleteTimer, togglePaused, togglePinned, checkElapseds, updatePosition, setOriginalPosition, toggleFocused } = useTimers();
-
-  useEffect(() => {
-    checkElapseds();
-  }, [checkElapseds]);
+  const { timers, deleteTimer, togglePaused, togglePinned, updatePosition, toggleFocused } = useTimers();
 
   const handleOnDragEnd = (result: any) => {
     if (!result.destination) return;
@@ -40,7 +37,7 @@ export default function Home() {
 
   const sortedTimers = [...timers].sort((a, b) => a.position - b.position);
 
-  return (
+  return <>
     <DragDropContext onDragEnd={handleOnDragEnd}>
       <Droppable droppableId="timers" direction="horizontal">
         {(provided) => (
@@ -51,110 +48,7 @@ export default function Home() {
           >
             {sortedTimers.map((timer, index) => (
               <Draggable key={timer.id} draggableId={timer.id.toString()} index={index} isDragDisabled={timer.pinned}>
-                {(provided) => (
-                  <div
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                    {...(timer.pinned ? {} : provided.dragHandleProps)}
-                    className="bg-[#d1ccc7] dark:bg-[#131212] border border-[#201f1f1c] rounded-xl p-4 sm:w-[200px]"
-                  >
-                    <div className="flex justify-between flex-row-reverse h-8 w-full">
-                      <Scan
-                        fill="currentColor"
-                        size={30}
-                        onClick={() => toggleFocused(timer.id)}
-                        className={cn(
-                          "cursor-pointer rounded-full p-1.5 text-primary-foreground",
-                          "dark:text-[#fde047] bg-[#fde047] dark:bg-[#201f1f] text-[#201f1f]",
-                          "hover:bg-[#fde047] dark:hover:bg-[#201f1f]"
-                        )}
-                      />
-                      {!timer.pinned ? (
-                        <>
-                          {timers.some(timer => timer.pinned) ? <></> : (
-                            <Pin
-                              fill="currentColor"
-                              size={30}
-                              onClick={() => {
-                                if (timers.every((t) => !t.pinned)) {
-                                  togglePinned(timer.id);
-                                  setOriginalPosition(timer.id, timer.position);
-                                  updatePosition(timer.id, 0);
-                                }
-                              }}
-                              className={cn(
-                                "cursor-pointer rounded-full p-1.5 text-primary-foreground", {
-                                  "dark:text-blue-900 bg-blue-100 dark:bg-blue-400": timers.every((t) => !t.pinned),
-                                  "hover:bg-blue-200 dark:hover:bg-blue-300": timers.every((t) => !t.pinned),
-                                  "dark:text-gray-900 bg-gray-100 dark:bg-gray-400": timers.some((t) => t.pinned),
-                                  "hover:bg-gray-200 dark:hover:bg-gray-300": timers.some((t) => t.pinned)
-                                }
-                              )}
-                            />
-                          )}
-                        </>
-                      ) : (
-                        <PinOff
-                          fill="currentColor" size={30}
-                          onClick={() => {
-                            togglePinned(timer.id);
-                            const originalPosition = timer.originalPosition ?? timer.position;
-                            updatePosition(timer.id, originalPosition);
-                          }}
-                          className={cn(
-                            "cursor-pointer rounded-full p-1.5 text-primary-foreground",
-                            "dark:text-blue-900 bg-blue-100 dark:bg-blue-400",
-                            "hover:bg-blue-200 dark:hover:bg-blue-300"
-                          )}
-                        />
-                      )}
-                    </div>
-
-                    <div className="flex justify-center items-center">
-                      {/* <CircleProgressTimer duration={
-                        (dayJS(timer.endedAt).diff(timer.startedAt, "seconds") - (timer.elapsed ?? 0))
-                      } isPaused={timer.isPaused} timerId={timer.id} /> */}
-                      <CircleProgressTimer timer={timer} />
-                    </div>
-
-                    <div className="flex justify-between">
-                      <X
-                        fill="currentColor"
-                        size={30}
-                        className={cn(
-                          "cursor-pointer rounded-full p-1.5 text-primary-foreground",
-                          "dark:text-red-900 bg-red-100 dark:bg-red-400",
-                          "hover:bg-red-200 dark:hover:bg-red-300"
-                        )}
-                        onClick={() => deleteTimer(timer.id)}
-                      />
-
-                      {timer.isPaused ? (
-                        <Play
-                          fill="currentColor"
-                          size={30}
-                          onClick={() => togglePaused(timer.id)}
-                          className={cn(
-                            "cursor-pointer rounded-full p-1.5 text-primary-foreground",
-                            "dark:text-green-900 bg-green-100 dark:bg-green-400",
-                            "hover:bg-green-200 dark:hover:bg-green-300"
-                          )}
-                        />
-                      ) : (
-                        <Pause
-                          fill="currentColor"
-                          size={30}
-                          onClick={() => togglePaused(timer.id)}
-                          className={cn(
-                            "cursor-pointer rounded-full p-1.5 text-primary-foreground",
-                            "dark:text-yellow-900 bg-yellow-100 dark:bg-yellow-400",
-                            "hover:bg-yellow-200 dark:hover:bg-yellow-300"
-                          )}
-                        />
-                      )}
-                    </div>
-                  </div>
-                )}
+                {(provided) => <TimerCard {...timer} provided={provided} />}
               </Draggable>
             ))}
 
@@ -179,5 +73,9 @@ export default function Home() {
         )}
       </Droppable>
     </DragDropContext>
-  );
+
+    <pre>
+      {JSON.stringify(timers, null, 2)}
+    </pre>
+  </>;
 }
