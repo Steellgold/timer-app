@@ -5,7 +5,7 @@ import { Component } from "./ui/component";
 import { DraggableProvided } from "@hello-pangea/dnd";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import { useEffect, useRef, useState } from "react";
-import { Bell, Pause, Play, X } from "lucide-react";
+import { Bell, Pause, Pin, PinOff, Play, Scan, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { dayJS } from "@/lib/dayjs/day-js";
 
@@ -19,7 +19,7 @@ export const TimerCard: Component<Timer & { provided: DraggableProvided }> = ({
   title,
   id
 }) => {
-  const { deleteTimer, togglePaused, toggleEnd } = useTimers()
+  const { timers, deleteTimer, togglePaused, toggleEnd, togglePinned, toggleFocused } = useTimers()
   const audio = useRef(new Audio('/sounds/horror.mp3'));
   
   const [timeLeft, setTimeLeft] = useState<number>((dayJS(endAt).diff(dayJS(), "seconds")));
@@ -48,12 +48,66 @@ export const TimerCard: Component<Timer & { provided: DraggableProvided }> = ({
     <div ref={provided.innerRef} {...provided.draggableProps} {...(pinned ? {} : provided.dragHandleProps)}
       className="bg-[#d1ccc7] dark:bg-[#131212] border border-[#201f1f1c] rounded-xl p-4 sm:w-[200px]"
     >
+      <div className="flex justify-between items-center mb-2">
+        {pinned ? (
+          <PinOff
+            fill="currentColor"
+            size={30}
+            onClick={() => !isEnded && togglePinned(id)}
+              className={cn(
+              "cursor-pointer rounded-full p-1.5 text-primary-foreground",
+              "dark:text-blue-800 bg-blue-50 dark:bg-blue-300",
+              "hover:bg-blue-300 dark:hover:bg-blue-400", {
+                "opacity-50 hover:cursor-not-allowed": isEnded
+              }
+            )}
+          />
+        ) : (timers.some(timer => timer.pinned) ? (
+          <PinOff
+            fill="currentColor"
+            size={30}
+            className={cn(
+              "opacity-10",
+              "cursor-pointer rounded-full p-1.5 text-primary-foreground",
+              "dark:text-gray-800 bg-gray-50 dark:bg-gray-300",
+              "hover:bg-gray-300 dark:hover:bg-gray-400", {
+                "hover:cursor-not-allowed": timers.some(timer => timer.pinned)
+              }
+            )}
+          />
+        ) :
+          <Pin
+            fill="currentColor"
+            size={30}
+            onClick={() => !isEnded && togglePinned(id)}
+            className={cn(
+              "cursor-pointer rounded-full p-1.5 text-primary-foreground",
+              "dark:text-blue-900 bg-blue-100 dark:bg-blue-400",
+              "hover:bg-blue-200 dark:hover:bg-blue-300", {
+                "opacity-50 hover:cursor-not-allowed": isEnded
+              }
+            )}
+          />
+        )}
+
+        {/* <Scan
+          fill="currentColor"
+          size={30}
+          onClick={() => toggleFocused(id)}
+          className={cn(
+            "cursor-pointer rounded-full p-1.5 text-primary-foreground",
+            "dark:text-indigo-900 bg-indigo-100 dark:bg-indigo-400",
+            "hover:bg-indigo-200 dark:hover:bg-indigo-300"
+          )}
+        /> */}
+      </div>
+
       <div className="relative">
         <CircularProgressbar
           value={!isEnded ? pourcentage : 0}
           styles={buildStyles({
             pathColor: '#fff',
-            trailColor: 'grey',
+            trailColor: '#201f1f',
             pathTransitionDuration: 0.5,
             strokeLinecap: 'round',
           })}
