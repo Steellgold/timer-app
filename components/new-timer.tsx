@@ -83,24 +83,21 @@ export const NewTimerDrawer: Component<PropsWithChildren & {
             <p className="text-muted-foreground text-xs text-center">Click outside the drawer to cancel.</p>
             <Button size={"sm"}
               onClick={() => {
-                const startedAt = new Date();
-                startedAt.setHours(+hours);
-                startedAt.setMinutes(+minutes);
-                startedAt.setSeconds(+seconds);
-
                 createTimer({
                   id: Math.random().toString(36).substr(2, 9),
-                  name: timerName,
-                  position: timers.length + 1,
-                  startedAt: dayJS(),
-                  endedAt: dayJS().add(+hours, "hours").add(+minutes, "minutes").add(+seconds, "seconds"),
-                  endSong: "default",
-                  isPaused: false,
-                  isEnded: false,
+                  title: timerName,
+
+                  position: Math.max(...timers.map(timer => timer.position), 0) + 1,
+                  ogPosition: Math.max(...timers.map(timer => timer.position), 0) + 1,
+                  
+                  startAt: dayJS().valueOf(),
+                  endAt: dayJS().add(+hours, "hour").add(+minutes, "minute").add(+seconds, "second").valueOf(),
+                  
                   isFocused: false,
-                  backgroundImage: null,
+                  isPaused: false,
+                  
+                  pausedAt: 0,
                   pinned: false,
-                  elapsed: 0,
                 });
 
                 setHours("00");
@@ -109,7 +106,8 @@ export const NewTimerDrawer: Component<PropsWithChildren & {
                 setTimerName("");
               }}
             >
-              Submit</Button>
+              Submit
+            </Button>
           </DrawerFooter>
         </div>
       </DrawerContent>
