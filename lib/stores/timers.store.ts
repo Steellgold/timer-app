@@ -1,165 +1,69 @@
-import { Dayjs } from "dayjs";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { dayJS } from "../dayjs/day-js";
 
 export type Timer = {
   id: string;
-  name: string;
 
+  title?: string;
+  
   position: number;
-  originalPosition?: number;
+  ogPosition?: number;
 
-  elapsed: number;
+  startAt: number;
+  endAt: number;
 
-  startedAt: Dayjs;
-  endedAt: Dayjs;
-
+  pausedAt: number;
   isPaused: boolean;
-  isEnded: boolean;
+  isEnded?: boolean;
+
   isFocused: boolean;
 
-  endSong: "default" | string;
-  backgroundImage: null | string;
-  
   pinned: boolean;
-};
+}
 
-type TimersStore = {
+type TimerStore = {
   timers: Timer[];
-  
+
   createTimer: (timer: Timer) => void;
   deleteTimer: (id: string) => void;
 
-  addElapsed: (id: string, elapsed: number) => void;
+  updatePosition: (id: string, position: number) => void;
+  resetPosition: (id: string) => void;
+  resetPositions: () => void;
+
+  toggleEnd: (id: string) => void;
 
   togglePaused: (id: string) => void;
   togglePinned: (id: string) => void;
-
   toggleFocused: (id: string) => void;
-  removeFocusMode: () => void;
-  
-  setEndSong: (id: string, song: "default" | string) => void;
-  setBackgroundImage: (id: string, url: null | string) => void;
+}
 
-  checkElapseds: () => void;
-
-  updatePosition: (id: string, position: number) => void;
-  setOriginalPosition: (id: string, position: number) => void;
-
-  endTimer: (id: string) => void;
-};
-
-const updateTimer = (
-  state: TimersStore, 
-  id: string, 
-  updates: Partial<Timer>
-): Timer[] => {
-  return state.timers.map((timer) => 
-    (timer.id === id ? { ...timer, ...updates } : timer)
+const updateTimer = (state: TimerStore, id: string, updates: Partial<Timer>): Timer[] => {
+  return state.timers.map((timer) =>
+    timer.id === id ? { ...timer, ...updates } : timer
   );
 };
 
-export const useTimers = create(persist<TimersStore>(
-  (set) => ({
+export const useTimers = create(
+  persist<TimerStore>((set) => ({
     timers: [],
-    
-    createTimer: (timer) => 
-      set((state) => ({ timers: [...state.timers, timer] })),
-    
-    deleteTimer: (id) => 
-      set((state) => ({ timers: state.timers.filter((timer) => timer.id !== id) })),
 
-    addElapsed: (id, elapsed) =>
-      set((state) => ({ 
-        timers: updateTimer(state, id, { elapsed: (state.timers.find((timer) => timer.id === id)?.elapsed ?? 0) + elapsed })
-      })),
+    createTimer: (timer) => set((state) => ({ timers: [...state.timers, timer] })),
+    deleteTimer: (id) => set((state) => ({ timers: state.timers.filter((timer) => timer.id !== id) })),
 
-    togglePaused: (id) =>
-      set((state) => ({ 
-        timers: updateTimer(state, id, { isPaused: !state.timers.find((timer) => timer.id === id)?.isPaused })
-      })),
-    
-    togglePinned: (id) => 
-      set((state) => ({ 
-        timers: updateTimer(state, id, { pinned: !state.timers.find((timer) => timer.id === id)?.pinned })
-      })),
+    updatePosition: (id, position) => set((state) => ({ timers: updateTimer(state, id, { position }) })),
+    resetPosition: (id) => set((state) => ({ timers: updateTimer(state, id, { position: state.timers.find((timer) => timer.id === id)?.ogPosition ?? 0 }) })),
+    resetPositions: () => set((state) => ({ timers: state.timers.map((timer) => ({ ...timer, position: timer.ogPosition ?? 0 })) })),
 
-    toggleFocused: (id) =>
-      set((state) => ({ 
-        timers: updateTimer(state, id, { isFocused: !state.timers.find((timer) => timer.id === id)?.isFocused })
-      })),
-   
-    removeFocusMode: () =>
-      set((state) => {
-        const focusedTimer = state.timers.find(timer => timer.isFocused);
-        if (focusedTimer) {
-          return {
-            timers: updateTimer(state, focusedTimer.id, { isFocused: false })
-          };
-        }
-        
-        return { timers: state.timers };
-      }),
+    togglePaused: (id) => set((state) => ({
+      timers: updateTimer(state, id, {
+        isPaused: !state.timers.find((timer) => timer.id === id)?.isPaused,
+        pausedAt: dayJS().valueOf()
+      }) })),
+    togglePinned: (id) => set((state) => ({ timers: updateTimer(state, id, { pinned: !state.timers.find((timer) => timer.id === id)?.pinned }) })),
+    toggleFocused: (id) => set((state) => ({ timers: updateTimer(state, id, { isFocused: !state.timers.find((timer) => timer.id === id)?.isFocused }) })),
 
-    setEndSong: (id, song) => 
-      set((state) => ({ 
-        timers: updateTimer(state, id, { endSong: song }) 
-      })),
-    
-    setBackgroundImage: (id, url) => 
-      set((state) => ({ 
-        timers: updateTimer(state, id, { backgroundImage: url }) 
-      })),
-
-    checkElapseds: () =>
-      set((state) => ({
-        timers: state.timers.map((timer) => {
-          if (timer.isPaused) return timer;
-          const elapsed = dayJS().diff(timer.startedAt, "seconds");
-          const isEnded = elapsed >= timer.elapsed;
-          return { ...timer, elapsed, isEnded };
-        })
-      })),
-
-      updatePosition: (id, newPosition) =>
-        set((state) => {
-          const timerToMove = state.timers.find(timer => timer.id === id);
-          if (!timerToMove) return { timers: state.timers };
-      
-          let updatedTimers = state.timers.filter(timer => timer.id !== id);
-      
-          if (timerToMove.position < newPosition) {
-            updatedTimers = updatedTimers.map(timer => {
-              if (timer.position > timerToMove.position && timer.position <= newPosition) {
-                return { ...timer, position: timer.position - 1 };
-              }
-              return timer;
-            });
-          } else {
-            updatedTimers = updatedTimers.map(timer => {
-              if (timer.position < timerToMove.position && timer.position >= newPosition) {
-                return { ...timer, position: timer.position + 1 };
-              }
-              return timer;
-            });
-          }
-      
-          timerToMove.position = newPosition;
-          updatedTimers.splice(newPosition, 0, timerToMove);
-      
-          return { timers: updatedTimers };
-        }),
-        setOriginalPosition: (id, position) =>
-          set((state) => ({
-            timers: updateTimer(state, id, { originalPosition: position })
-          })
-        ),
-        endTimer: (id) =>
-          set((state) => ({
-            timers: updateTimer(state, id, { isEnded: true })
-          })
-        )
-  }),
-  { name: "timers" }
-));
+    toggleEnd: (id) => set((state) => ({ timers: updateTimer(state, id, { isEnded: true }) }))
+  }), { name: "timers" })
+);
