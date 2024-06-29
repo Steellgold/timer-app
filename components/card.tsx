@@ -23,7 +23,7 @@ export const TimerCard: Component<Timer & { provided: DraggableProvided }> = ({
   const audio = useRef(new Audio('/sounds/horror.mp3'));
   
   const [timeLeft, setTimeLeft] = useState<number>((dayJS(endAt).diff(dayJS(), "seconds")));
-  const [pourcentage, setPourcentage] = useState<number>(0);
+  const [pourcentage, setPourcentage] = useState<number>((timeLeft / (dayJS(endAt).diff(dayJS(startAt), "seconds")) * 100));
 
   useEffect(() => {
     if (timeLeft <= 0) {
@@ -120,7 +120,9 @@ export const TimerCard: Component<Timer & { provided: DraggableProvided }> = ({
             {dayJS(endAt).format("HH:mm")}
           </div>
 
-          {!isEnded && <div className="text-2xl font-bold">{dayJS(timeLeft * 1000).format("mm:ss")}</div>}
+          {!isEnded && <div className="text-2xl font-bold">
+            {timeLeft > 3600 ? dayJS(timeLeft * 1000).format("HH:mm:ss") : dayJS(timeLeft * 1000).format("mm:ss")}
+          </div>}
           {isEnded && <div className="text-2xl font-bold">00:00</div>}
         </div>
       </div>

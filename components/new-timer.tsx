@@ -88,7 +88,6 @@ export const NewTimerDrawer: Component<PropsWithChildren & {
                   title: timerName,
 
                   position: Math.max(...timers.map(timer => timer.position), 0) + 1,
-                  ogPosition: Math.max(...timers.map(timer => timer.position), 0) + 1,
                   
                   startAt: dayJS().valueOf(),
                   endAt: dayJS().add(+hours, "hour").add(+minutes, "minute").add(+seconds, "second").valueOf(),
