@@ -14,6 +14,7 @@ const nunito = Nunito({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Timer - An app to count down the time",
   description: "Open source timer app to count down the time",
+  manifest: "/manifest.json"
 };
 
 const RootLayout: Component<PropsWithChildren> = ({ children }) => {
