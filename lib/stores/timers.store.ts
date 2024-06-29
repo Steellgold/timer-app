@@ -51,11 +51,33 @@ export const useTimers = create(
       return { timers: timersWithUpdatedPositions };
     }),
 
-    togglePaused: (id) => set((state) => ({
-      timers: updateTimer(state, id, {
-        isPaused: !state.timers.find((timer) => timer.id === id)?.isPaused,
-        pausedAt: dayJS().valueOf()
-      }) })),
+    togglePaused: (id) => set((state) => {
+      const timerToUpdate = state.timers.find((timer) => timer.id === id);
+      if (!timerToUpdate) return state;
+
+      const isPaused = !timerToUpdate.isPaused;
+      let updatedTimers: Timer[];
+
+      if (isPaused) {
+        updatedTimers = updateTimer(state, id, {
+          isPaused: true,
+          pausedAt: dayJS().valueOf()
+        });
+      } else {
+        const pausedDuration = dayJS().valueOf() - timerToUpdate.pausedAt;
+        const updatedEndAt = timerToUpdate.endAt + pausedDuration;
+
+        updatedTimers = updateTimer(state, id, {
+          isPaused: false,
+          pausedAt: 0,
+          endAt: updatedEndAt
+        });
+      }
+
+      return { timers: updatedTimers };
+    }),
+    
+
     togglePinned: (id) => set((state) => ({ timers: updateTimer(state, id, { pinned: !state.timers.find((timer) => timer.id === id)?.pinned }) })),
     toggleFocused: (id) => set((state) => ({ timers: updateTimer(state, id, { isFocused: !state.timers.find((timer) => timer.id === id)?.isFocused }) })),
     toggleEnd: (id) => set((state) => ({ timers: updateTimer(state, id, { isEnded: true }) }))

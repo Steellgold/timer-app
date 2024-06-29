@@ -68,12 +68,12 @@ export const NewTimerDrawer: Component<PropsWithChildren & {
               />
 
               <Input placeholder="00" value={minutes} max={60}
-                onChange={(e) => setMinutes(numberFormat(e.target.value, 59))}
+                onChange={(e) => setMinutes(numberFormat(e.target.value ?? 0, 59))}
                 className={inputStyles}
               />
 
               <Input placeholder="00" value={seconds} max={60}
-                onChange={(e) => setSeconds(numberFormat(e.target.value, 59))}
+                onChange={(e) => setSeconds(numberFormat(e.target.value ?? 0, 59))}
                 className={inputStyles}
               />
             </div>
@@ -83,18 +83,32 @@ export const NewTimerDrawer: Component<PropsWithChildren & {
             <p className="text-muted-foreground text-xs text-center">Click outside the drawer to cancel.</p>
             <Button size={"sm"}
               onClick={() => {
+                const startTimestamp = dayJS().valueOf();
+                let endTimestamp = dayJS(startTimestamp);
+                if (Number(hours) !== 0) {
+                  console.log("hours", hours);
+                  endTimestamp = endTimestamp.add(Number(hours), "hours");
+                }
+
+                if (Number(minutes) !== 0) {
+                  console.log("minutes", minutes);
+                  endTimestamp = endTimestamp.add(Number(minutes), "minutes");
+                }
+
+                if (Number(seconds) !== 0) {
+                  console.log("seconds", seconds);
+                  endTimestamp = endTimestamp.add(Number(seconds), "seconds");
+                }
+                console.log(hours, minutes, seconds, endTimestamp.valueOf());
+
                 createTimer({
                   id: Math.random().toString(36).substr(2, 9),
                   title: timerName,
-
                   position: Math.max(...timers.map(timer => timer.position), 0) + 1,
-                  
-                  startAt: dayJS().valueOf(),
-                  endAt: dayJS().add(+hours, "hour").add(+minutes, "minute").add(+seconds, "second").valueOf(),
-                  
+                  startAt: startTimestamp,
+                  endAt: endTimestamp.valueOf(),
                   isFocused: false,
                   isPaused: false,
-                  
                   pausedAt: 0,
                   pinned: false,
                 });
