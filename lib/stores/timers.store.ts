@@ -14,7 +14,7 @@ export type Timer = {
   isFocused: boolean;
   pinned: boolean;
 
-  colorTheme: "default" | "blue" | "green" | "red" | "yellow" | "purple";
+  colorTheme: "default" | "blue" | "green" | "red" | "yellow" | "purple" | "pink" | "teal" | "cyan" | "orange" | "indigo";
 }
 
 type TimerStore = {

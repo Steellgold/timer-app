@@ -76,7 +76,12 @@ export const TimerCard: Component<Timer & {
               "border-green-400 dark:border-[#3bbf4a] bg-green-50 dark:bg-[#3bbf4a]": colorTheme === "green",
               "border-red-400 dark:border-[#bf3b3b] bg-red-50 dark:bg-[#bf3b3b]": colorTheme === "red",
               "border-yellow-400 dark:border-[#bfbe3b] bg-yellow-50 dark:bg-[#bfbe3b]": colorTheme === "yellow",
-              "border-purple-400 dark:border-[#8e3bbf] bg-purple-50 dark:bg-[#8e3bbf]": colorTheme === "purple"
+              "border-purple-400 dark:border-[#8e3bbf] bg-purple-50 dark:bg-[#8e3bbf]": colorTheme === "purple",
+              "border-pink-400 dark:border-[#bf3b8e] bg-pink-50 dark:bg-[#bf3b8e]": colorTheme === "pink",
+              "border-teal-400 dark:border-[#3bbfbf] bg-teal-50 dark:bg-[#3bbfbf]": colorTheme === "teal",
+              "border-cyan-400 dark:border-[#3bbfbb] bg-cyan-50 dark:bg-[#3bbfbb]": colorTheme === "cyan",
+              "border-orange-400 dark:border-[#bf8e3b] bg-orange-50 dark:bg-[#bf8e3b]": colorTheme === "orange",
+              "border-indigo-400 dark:border-[#3b3bbf] bg-indigo-50 dark:bg-[#3b3bbf]": colorTheme === "indigo"
             })}
           >
             <div className="flex justify-between items-center mb-2">
@@ -120,6 +125,26 @@ export const TimerCard: Component<Timer & {
                     <div className={cn("h-8 w-8 cursor-pointer rounded-full dark:bg-purple-400 bg-purple-100 border-[2px]", {
                       "dark:border-purple-400 border-purple-100": colorTheme === "purple"
                     })} onClick={() => toggleTheme(id, "purple")} />
+
+                    <div className={cn("h-8 w-8 cursor-pointer rounded-full dark:bg-pink-400 bg-pink-100 border-[2px]", {
+                      "dark:border-pink-400 border-pink-100": colorTheme === "pink"
+                    })} onClick={() => toggleTheme(id, "pink")} />
+
+                    <div className={cn("h-8 w-8 cursor-pointer rounded-full dark:bg-teal-400 bg-teal-100 border-[2px]", {
+                      "dark:border-teal-400 border-teal-100": colorTheme === "teal"
+                    })} onClick={() => toggleTheme(id, "teal")} />
+
+                    <div className={cn("h-8 w-8 cursor-pointer rounded-full dark:bg-cyan-400 bg-cyan-100 border-[2px]", {
+                      "dark:border-cyan-400 border-cyan-100": colorTheme === "cyan"
+                    })} onClick={() => toggleTheme(id, "cyan")} />
+
+                    <div className={cn("h-8 w-8 cursor-pointer rounded-full dark:bg-orange-400 bg-orange-100 border-[2px]", {
+                      "dark:border-orange-400 border-orange-100": colorTheme === "orange"
+                    })} onClick={() => toggleTheme(id, "orange")} />
+
+                    <div className={cn("h-8 w-8 cursor-pointer rounded-full dark:bg-indigo-400 bg-indigo-100 border-[2px]", {
+                      "dark:border-indigo-400 border-indigo-100": colorTheme === "indigo"
+                    })} onClick={() => toggleTheme(id, "indigo")} />
                   </div>
                 </PopoverContent>
               </Popover>
@@ -134,13 +159,23 @@ export const TimerCard: Component<Timer & {
                               : colorTheme === "green" ? '#86efac'
                               : colorTheme === "red" ? '#fca5a5'
                               : colorTheme === "yellow" ? '#fde047'
-                              : '#d8b4fe',
+                              : colorTheme === "purple" ? '#d8b4fe
+                              : colorTheme === "pink" ? '#fbb6ce'
+                              : colorTheme === "teal" ? '#6ee7b7'
+                              : colorTheme === "cyan" ? '#93c5fd'
+                              : colorTheme === "orange" ? '#f6ad55'
+                              : '#c084fc',
                      pathColor: colorTheme === "default" ? '#4b4a4a'
                               : colorTheme === "blue" ? '#60a5fa'
                               : colorTheme === "green" ? '#4ade80'
                               : colorTheme === "red" ? '#f87171'
                               : colorTheme === "yellow" ? '#facc15'
-                              : '#c084fc',
+                              : colorTheme === "purple" ? '#c084fc'
+                              : colorTheme === "pink" ? '#f472b6'
+                              : colorTheme === "teal" ? '#34d399'
+                              : colorTheme === "cyan" ? '#60a5fa'
+                              : colorTheme === "orange" ? '#f97316'
+                              : '#8b5cf6',
                   pathTransitionDuration: 0.5,
                   strokeLinecap: 'round',
                 })}
@@ -207,6 +242,11 @@ const colorScheme = (colorTheme: Timer["colorTheme"], ...inputs: ClassValue[]): 
     "text-yellow-900 dark:text-yellow-900 hover:bg-yellow-200 dark:hover:bg-yellow-300 bg-yellow-100 dark:bg-yellow-400": colorTheme === "yellow",
     "text-green-900 dark:text-green-900 hover:bg-green-200 dark:hover:bg-green-300 bg-green-100 dark:bg-green-400": colorTheme === "green",
     "text-red-900 dark:text-red-900 hover:bg-red-200 dark:hover:bg-red-300 bg-red-100 dark:bg-red-400": colorTheme === "red",
-    "text-purple-900 dark:text-purple-900 hover:bg-purple-200 dark:hover:bg-purple-300 bg-purple-100 dark:bg-purple-400": colorTheme === "purple"
+    "text-purple-900 dark:text-purple-900 hover:bg-purple-200 dark:hover:bg-purple-300 bg-purple-100 dark:bg-purple-400": colorTheme === "purple",
+    "text-pink-900 dark:text-pink-900 hover:bg-pink-200 dark:hover:bg-pink-300 bg-pink-100 dark:bg-pink-400": colorTheme === "pink",
+    "text-teal-900 dark:text-teal-900 hover:bg-teal-200 dark:hover:bg-teal-300 bg-teal-100 dark:bg-teal-400": colorTheme === "teal",
+    "text-cyan-900 dark:text-cyan-900 hover:bg-cyan-200 dark:hover:bg-cyan-300 bg-cyan-100 dark:bg-cyan-400": colorTheme === "cyan",
+    "text-orange-900 dark:text-orange-900 hover:bg-orange-200 dark:hover:bg-orange-300 bg-orange-100 dark:bg-orange-400": colorTheme === "orange",
+    "text-indigo-900 dark:text-indigo-900 hover:bg-indigo-200 dark:hover:bg-indigo-300 bg-indigo-100 dark:bg-indigo-400": colorTheme === "indigo"
   });
 }
