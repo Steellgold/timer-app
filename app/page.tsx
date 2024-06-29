@@ -73,5 +73,9 @@ export default function Home() {
         )}
       </Droppable>
     </DragDropContext>
+
+    <pre>
+      {JSON.stringify(timers, null, 2)}
+    </pre>
   </>;
 }
