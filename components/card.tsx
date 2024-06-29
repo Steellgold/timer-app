@@ -5,7 +5,7 @@ import { Component } from "./ui/component";
 import { DraggableProvided } from "@hello-pangea/dnd";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import { useEffect, useRef, useState } from "react";
-import { Bell, PaintBucket, Pause, Pin, PinOff, Play, Scan, X } from "lucide-react";
+import { Bell, PaintBucket, Pause, Pin, PinOff, Play, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { dayJS } from "@/lib/dayjs/day-js";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -25,7 +25,7 @@ export const TimerCard: Component<Timer & {
   id,
   colorTheme
 }) => {
-  const { timers, deleteTimer, togglePaused, toggleEnd, togglePinned, toggleFocused, toggleTheme } = useTimers()
+  const { timers, deleteTimer, togglePaused, toggleEnd, togglePinned, toggleTheme } = useTimers()
   const audio = useRef(new Audio('/sounds/soft.mp3'));
   
   const [timeLeft, setTimeLeft] = useState<number>((dayJS(endAt).diff(dayJS(), "seconds")));
@@ -159,7 +159,7 @@ export const TimerCard: Component<Timer & {
                               : colorTheme === "green" ? '#86efac'
                               : colorTheme === "red" ? '#fca5a5'
                               : colorTheme === "yellow" ? '#fde047'
-                              : colorTheme === "purple" ? '#d8b4fe
+                              : colorTheme === "purple" ? '#d8b4fe'
                               : colorTheme === "pink" ? '#fbb6ce'
                               : colorTheme === "teal" ? '#6ee7b7'
                               : colorTheme === "cyan" ? '#93c5fd'
@@ -201,12 +201,12 @@ export const TimerCard: Component<Timer & {
                 fill="currentColor"
                 strokeWidth={4}
                 size={30}
-                className={colorScheme(colorTheme, "cursor-pointer rounded-full p-1.5 text-primary-foreground")}
                 onClick={() => {
                   deleteTimer(id);
                   audio.current.pause();
                   audio.current.currentTime = 0;
                 }}
+                className={colorScheme(colorTheme, "cursor-pointer rounded-full p-1.5 text-primary-foreground")}
               />
 
               {!isPaused ? (
