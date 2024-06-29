@@ -27,7 +27,15 @@ export default function Home() {
     </div>
   )
 
-  const sortedTimers = timers.sort((a, b) => a.position - b.position);
+  const sortedTimers = [...timers].sort((a, b) => {
+    if (a.pinned && !b.pinned) {
+      return -1;
+    } else if (!a.pinned && b.pinned) {
+      return 1;
+    } else {
+      return a.position - b.position;
+    }
+  });
 
   return <>
     <DragDropContext onDragEnd={onDragEnd}>
