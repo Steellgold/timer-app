@@ -12,21 +12,12 @@ import { useMediaQuery } from "@/lib/hooks/use-media-query";
 export default function Home() {
   const { timers, updatePosition } = useTimers();
   const isDesktop = useMediaQuery('(min-width: 640px)');
-  const [timersPerRow, setTimersPerRow] = useState(3);
   
   useEffect(() => {
     if (Notification.permission !== 'granted') {
       Notification.requestPermission();
     }
   }, []);
-
-  useEffect(() => {
-    if (isDesktop) {
-      setTimersPerRow(3);
-    } else {
-      setTimersPerRow(1);
-    }
-  }, [isDesktop]);
 
   const onDragEnd = (result: DropResult) => {
     if (!result.destination) return;

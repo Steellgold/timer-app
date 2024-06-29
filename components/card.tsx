@@ -4,13 +4,14 @@ import { Timer, useTimers } from "@/lib/stores/timers.store";
 import { Component } from "./ui/component";
 import { DraggableProvided } from "@hello-pangea/dnd";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Bell, PaintBucket, Pause, Pin, PinOff, Play, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { dayJS } from "@/lib/dayjs/day-js";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { ClassValue } from "clsx";
+import useAudioStore from "@/lib/stores/audio.store";
 
 export const TimerCard: Component<Timer & {
   provided: DraggableProvided
@@ -23,10 +24,11 @@ export const TimerCard: Component<Timer & {
   isEnded,
   title,
   id,
+  song,
   colorTheme
 }) => {
   const { timers, deleteTimer, togglePaused, toggleEnd, togglePinned, toggleTheme } = useTimers()
-  const audio = useRef(new Audio('/sounds/soft.mp3'));
+  const { toggleStop, togglePlay } = useAudioStore();
   
   const [timeLeft, setTimeLeft] = useState<number>((dayJS(endAt).diff(dayJS(), "seconds")));
   const [pourcentage, setPourcentage] = useState<number>((timeLeft / (dayJS(endAt).diff(dayJS(startAt), "seconds")) * 100));
@@ -34,7 +36,7 @@ export const TimerCard: Component<Timer & {
   useEffect(() => {
     if (timeLeft <= 0) {
       toggleEnd(id);
-      audio.current.play();
+      togglePlay(song);
 
       if (Notification.permission === 'granted') {
         new Notification('Timer terminé', {
@@ -43,7 +45,7 @@ export const TimerCard: Component<Timer & {
         });
       };
     }
-  }, [timeLeft, id, toggleEnd, deleteTimer]);
+  }, [timeLeft, id, toggleEnd, deleteTimer, togglePlay, song]);
 
   useEffect(() => {
     if (timeLeft > 0) {
@@ -196,8 +198,7 @@ export const TimerCard: Component<Timer & {
                 size={30}
                 onClick={() => {
                   deleteTimer(id);
-                  audio.current.pause();
-                  audio.current.currentTime = 0;
+                  toggleStop();
                 }}
                 className={colorScheme(colorTheme, "cursor-pointer rounded-full p-1.5 text-primary-foreground")}
               />
