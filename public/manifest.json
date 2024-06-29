@@ -449,11 +449,13 @@
       "sizes": "1024x1024"
     }
   ],
-	"name": "Timer",
-	"short_name": "Timer",
+  "name": "Timer",
+  "short_name": "Timer",
   "description": "Open source timer app to count down the time",
-	"start_url": "/?source=pwa",
-	"orientation": "portrait",
-	"display": "standalone",
-	"scope": "/"
+  "start_url": "/?source=pwa",
+  "orientation": "portrait",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#000000",
+  "background_color": "#000000"
 }
