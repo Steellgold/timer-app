@@ -1,28 +1,20 @@
 "use client";
 
-import { CircleProgressTimer } from "@/components/circle";
 import { NewTimerDrawer } from "@/components/new-timer";
-import { dayJS } from "@/lib/dayjs/day-js";
 import { cn } from "@/lib/utils";
-import { Pause, Pin, PinOff, Play, Plus, Scan, X } from "lucide-react";
-import { useEffect } from "react";
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { Plus } from "lucide-react";
+import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import { useTimers } from "@/lib/stores/timers.store";
 import { TimerCard } from "@/components/card";
 
 export default function Home() {
-  const { timers, deleteTimer, togglePaused, togglePinned, updatePosition, toggleFocused } = useTimers();
+  const { timers, updatePosition } = useTimers();
 
-  const handleOnDragEnd = (result: any) => {
+  const onDragEnd = (result: DropResult) => {
     if (!result.destination) return;
 
-    const { source, destination } = result;
-    const movedTimer = timers[source.index];
-
-    if (movedTimer.pinned) return;
-    if (destination.index === 0 && timers.some(timer => timer.pinned)) return;
-
-    updatePosition(movedTimer.id, destination.index);
+    console.log(result);
+    updatePosition(result.draggableId, result.destination.index, result.source.index);
   };
 
   if (!timers.length) return (
@@ -35,10 +27,10 @@ export default function Home() {
     </div>
   )
 
-  const sortedTimers = [...timers].sort((a, b) => a.position - b.position);
+  const sortedTimers = timers.sort((a, b) => a.position - b.position);
 
   return <>
-    <DragDropContext onDragEnd={handleOnDragEnd}>
+    <DragDropContext onDragEnd={onDragEnd}>
       <Droppable droppableId="timers" direction="horizontal">
         {(provided) => (
           <div
@@ -73,9 +65,5 @@ export default function Home() {
         )}
       </Droppable>
     </DragDropContext>
-
-    <pre>
-      {JSON.stringify(timers, null, 2)}
-    </pre>
   </>;
 }
