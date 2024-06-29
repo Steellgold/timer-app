@@ -36,14 +36,23 @@ export const TimerCard: Component<Timer & { provided: DraggableProvided }> = ({
     if (timeLeft > 0) {
       const timerTimeout = setTimeout(() => {
         if (isPaused) return;
-        setTimeLeft(timeLeft - 1);
-        setPourcentage((timeLeft / (dayJS(endAt).diff(dayJS(startAt), "seconds")) * 100));
+        setTimeLeft(prevTimeLeft => {
+          const newTimeLeft = prevTimeLeft - 1;
+          setPourcentage((newTimeLeft / (dayJS(endAt).diff(dayJS(startAt), "seconds"))) * 100);
+          return newTimeLeft;
+        });
       }, 1000);
       return () => clearTimeout(timerTimeout);
     }
   }, [timeLeft, isPaused, endAt, startAt]);
   
-
+  const formatRemainingTime = (seconds: number) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    return `${hours > 0 ? `${hours.toString().padStart(2, '0')}:` : ''}${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+  
   return (
     <div ref={provided.innerRef} {...provided.draggableProps} {...(pinned ? {} : provided.dragHandleProps)}
       className="bg-[#d1ccc7] dark:bg-[#131212] border border-[#201f1f1c] rounded-xl p-4 sm:w-[200px]"
@@ -89,17 +98,6 @@ export const TimerCard: Component<Timer & { provided: DraggableProvided }> = ({
             )}
           />
         )}
-
-        {/* <Scan
-          fill="currentColor"
-          size={30}
-          onClick={() => toggleFocused(id)}
-          className={cn(
-            "cursor-pointer rounded-full p-1.5 text-primary-foreground",
-            "dark:text-indigo-900 bg-indigo-100 dark:bg-indigo-400",
-            "hover:bg-indigo-200 dark:hover:bg-indigo-300"
-          )}
-        /> */}
       </div>
 
       <div className="relative">
@@ -121,7 +119,7 @@ export const TimerCard: Component<Timer & { provided: DraggableProvided }> = ({
           </div>
 
           {!isEnded && <div className="text-2xl font-bold">
-            {timeLeft > 3600 ? dayJS(timeLeft * 1000).format("HH:mm:ss") : dayJS(timeLeft * 1000).format("mm:ss")}
+            {formatRemainingTime(timeLeft)}
           </div>}
           {isEnded && <div className="text-2xl font-bold">00:00</div>}
         </div>
