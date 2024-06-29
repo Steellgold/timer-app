@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { dayJS } from "../dayjs/day-js";
+import { AudioType } from "./audio.store";
 
 export type Timer = {
   id: string;
@@ -14,6 +15,7 @@ export type Timer = {
   isFocused: boolean;
   pinned: boolean;
 
+  song: AudioType["song"];
   colorTheme: "default" | "blue" | "green" | "red" | "yellow" | "purple" | "pink" | "teal" | "cyan" | "orange" | "indigo";
 }
 

@@ -12,11 +12,14 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer"
 import { Input } from "@/components/ui/input";
-
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { cn, numberFormat } from "@/lib/utils";
 import { useTimers } from "@/lib/stores/timers.store";
 import { dayJS } from "@/lib/dayjs/day-js";
 import { Component } from "./ui/component";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
+import { AudioWaveform, Drum, Guitar, Piano } from "lucide-react";
+import { AudioType } from "@/lib/stores/audio.store";
 
 const inputStyles = cn(
   "w-20 h-16",
@@ -37,6 +40,7 @@ export const NewTimerDrawer: Component<PropsWithChildren & {
   const [seconds, setSeconds] = useState<string>("00");
 
   const [timerName, setTimerName] = useState<string>("");
+  const [song, setSong] = useState<AudioType["song"]>("drums");
 
   return (
     <Drawer onClose={() => {
@@ -59,7 +63,16 @@ export const NewTimerDrawer: Component<PropsWithChildren & {
           </DrawerHeader>
 
           <div className="flex flex-col space-y-2 items-center">
-            <Input placeholder="Timer name (optional)" className="w-3/4" value={timerName} onChange={(e) => setTimerName(e.target.value)} />
+            <div className="flex flex-row items-center space-x-2">
+              <Input placeholder="Timer name (optional)" className="w-3/4" value={timerName} onChange={(e) => setTimerName(e.target.value)} />
+              <Tabs defaultValue="tambour" onValueChange={(value) => setSong(value as AudioType["song"])}>
+                <TabsList className="flex gap-2 justify-center">
+                  <TabsTrigger value="tambour" className="flex gap-1 justify-center items-center"><Drum size={16} /></TabsTrigger>
+                  <TabsTrigger value="guitar" className="flex gap-1 justify-center items-center"><Guitar size={16} /></TabsTrigger>
+                  <TabsTrigger value="piano" className="flex gap-1 justify-center items-center"><Piano size={16} /></TabsTrigger>
+                </TabsList>
+              </Tabs>
+            </div>
 
             <div className="flex justify-center space-x-2">
               <Input placeholder="00" value={hours} max={24}
@@ -78,6 +91,7 @@ export const NewTimerDrawer: Component<PropsWithChildren & {
               />
             </div>
           </div>
+
 
           <DrawerFooter>
             <p className="text-muted-foreground text-xs text-center">Click outside the drawer to cancel.</p>
@@ -102,7 +116,7 @@ export const NewTimerDrawer: Component<PropsWithChildren & {
                 console.log(hours, minutes, seconds, endTimestamp.valueOf());
 
                 createTimer({
-                  id: Math.random().toString(36).substr(2, 9),
+                  id: Math.random().toString(36),
                   title: timerName,
                   position: Math.max(...timers.map(timer => timer.position), 0) + 1,
                   startAt: startTimestamp,
@@ -111,6 +125,7 @@ export const NewTimerDrawer: Component<PropsWithChildren & {
                   isPaused: false,
                   pausedAt: 0,
                   pinned: false,
+                  song: song,
                   colorTheme: "default"
                 });
 
