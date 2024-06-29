@@ -6,9 +6,27 @@ import { Plus } from "lucide-react";
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import { useTimers } from "@/lib/stores/timers.store";
 import { TimerCard } from "@/components/card";
+import { useEffect, useState } from "react";
+import { useMediaQuery } from "@/lib/hooks/use-media-query";
 
 export default function Home() {
   const { timers, updatePosition } = useTimers();
+  const isDesktop = useMediaQuery('(min-width: 640px)');
+  const [timersPerRow, setTimersPerRow] = useState(3);
+  
+  useEffect(() => {
+    if (Notification.permission !== 'granted') {
+      Notification.requestPermission();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isDesktop) {
+      setTimersPerRow(3);
+    } else {
+      setTimersPerRow(1);
+    }
+  }, [isDesktop]);
 
   const onDragEnd = (result: DropResult) => {
     if (!result.destination) return;
@@ -39,7 +57,8 @@ export default function Home() {
 
   return <>
     <DragDropContext onDragEnd={onDragEnd}>
-      <Droppable droppableId="timers" direction="horizontal">
+      <div className="max-[100%]">
+      <Droppable droppableId="timers" direction={isDesktop ? "horizontal" : "vertical"}>
         {(provided) => (
           <div
             className="flex flex-col sm:flex-row gap-1 flex-wrap"
@@ -72,10 +91,7 @@ export default function Home() {
           </div>
         )}
       </Droppable>
+      </div>
     </DragDropContext>
-
-    <pre>
-      {JSON.stringify(timers, null, 2)}
-    </pre>
   </>;
 }
