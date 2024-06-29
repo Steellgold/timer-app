@@ -111,6 +111,7 @@ export const NewTimerDrawer: Component<PropsWithChildren & {
                   isPaused: false,
                   pausedAt: 0,
                   pinned: false,
+                  colorTheme: "default"
                 });
 
                 setHours("00");

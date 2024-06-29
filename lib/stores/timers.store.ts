@@ -13,6 +13,8 @@ export type Timer = {
   isEnded?: boolean;
   isFocused: boolean;
   pinned: boolean;
+
+  colorTheme: "default" | "blue" | "green" | "red" | "yellow" | "purple";
 }
 
 type TimerStore = {
@@ -24,6 +26,8 @@ type TimerStore = {
   togglePaused: (id: string) => void;
   togglePinned: (id: string) => void;
   toggleFocused: (id: string) => void;
+
+  toggleTheme: (id: string, theme: Timer["colorTheme"]) => void;
 }
 
 const updateTimer = (state: TimerStore, id: string, updates: Partial<Timer>): Timer[] => {
@@ -80,6 +84,8 @@ export const useTimers = create(
 
     togglePinned: (id) => set((state) => ({ timers: updateTimer(state, id, { pinned: !state.timers.find((timer) => timer.id === id)?.pinned }) })),
     toggleFocused: (id) => set((state) => ({ timers: updateTimer(state, id, { isFocused: !state.timers.find((timer) => timer.id === id)?.isFocused }) })),
-    toggleEnd: (id) => set((state) => ({ timers: updateTimer(state, id, { isEnded: true }) }))
+    toggleEnd: (id) => set((state) => ({ timers: updateTimer(state, id, { isEnded: true }) })),
+
+    toggleTheme: (id, theme) => set((state) => ({ timers: updateTimer(state, id, { colorTheme: theme }) }))
   }), { name: "timers" })
 );
