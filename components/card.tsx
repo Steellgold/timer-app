@@ -12,6 +12,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { ClassValue } from "clsx";
 import useAudioStore from "@/lib/stores/audio.store";
+import useNotificationStore from "@/lib/stores/notifications.store";
 
 export const TimerCard: Component<Timer & {
   provided: DraggableProvided
@@ -29,37 +30,24 @@ export const TimerCard: Component<Timer & {
 }) => {
   const { timers, deleteTimer, togglePaused, toggleEnd, togglePinned, toggleTheme } = useTimers()
   const { toggleStop, togglePlay } = useAudioStore();
+  const { addNotification } = useNotificationStore();
   
   const [timeLeft, setTimeLeft] = useState<number>((dayJS(endAt).diff(dayJS(), "seconds")));
   const [pourcentage, setPourcentage] = useState<number>((timeLeft / (dayJS(endAt).diff(dayJS(startAt), "seconds")) * 100));
 
   useEffect(() => {
-    if ('Notification' in window) {
-      if (Notification.permission === 'granted') {
-        new Notification('Awesome! You will now receive notifications');
-      } else if (Notification.permission !== 'denied') {
-        Notification.requestPermission().then(permission => {
-          if (permission === 'granted') {
-            new Notification('Awesome! You will now receive notifications');
-          }
-        });
-      }
-    }
-  }, []);
-  
-  useEffect(() => {
     if (timeLeft <= 0) {
       toggleEnd(id);
       togglePlay(song);
 
-      if (Notification.permission === 'granted') {
-        new Notification('Timer terminé', {
-          body: 'Votre timer est terminé, vous pouvez en créer un nouveau !',
-          icon: '/favicon.ico'
-        });
-      };
+      addNotification({
+        title: "Timer terminé",
+        body: "Votre timer est terminé, vous pouvez en créer un nouveau !",
+        icon: "/favicon.ico",
+        id
+      });
     }
-  }, [timeLeft, id, toggleEnd, deleteTimer, togglePlay, song]);
+  }, [timeLeft, id, toggleEnd, deleteTimer, togglePlay, song, addNotification]);
 
   useEffect(() => {
     if (timeLeft > 0) {

@@ -6,27 +6,12 @@ import { Plus } from "lucide-react";
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import { useTimers } from "@/lib/stores/timers.store";
 import { TimerCard } from "@/components/card";
-import { useEffect, useState } from "react";
 import { useMediaQuery } from "@/lib/hooks/use-media-query";
 
 export default function Home() {
   const { timers, updatePosition } = useTimers();
   const isDesktop = useMediaQuery('(min-width: 640px)');
   
-  useEffect(() => {
-    if ('Notification' in window) {
-      if (Notification.permission === 'granted') {
-        new Notification('Awesome! You will now receive notifications');
-      } else if (Notification.permission !== 'denied') {
-        Notification.requestPermission().then(permission => {
-          if (permission === 'granted') {
-            new Notification('Awesome! You will now receive notifications');
-          }
-        });
-      }
-    }
-  }, []);
-
   const onDragEnd = (result: DropResult) => {
     if (!result.destination) return;
 
