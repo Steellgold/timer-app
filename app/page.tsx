@@ -14,8 +14,16 @@ export default function Home() {
   const isDesktop = useMediaQuery('(min-width: 640px)');
   
   useEffect(() => {
-    if (Notification.permission !== 'granted') {
-      Notification.requestPermission();
+    if ('Notification' in window) {
+      if (Notification.permission === 'granted') {
+        new Notification('Awesome! You will now receive notifications');
+      } else if (Notification.permission !== 'denied') {
+        Notification.requestPermission().then(permission => {
+          if (permission === 'granted') {
+            new Notification('Awesome! You will now receive notifications');
+          }
+        });
+      }
     }
   }, []);
 
