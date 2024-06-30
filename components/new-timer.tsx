@@ -17,8 +17,7 @@ import { cn, numberFormat } from "@/lib/utils";
 import { useTimers } from "@/lib/stores/timers.store";
 import { dayJS } from "@/lib/dayjs/day-js";
 import { Component } from "./ui/component";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
-import { AudioWaveform, Drum, Guitar, Piano } from "lucide-react";
+import { Drum, Guitar, Piano } from "lucide-react";
 import { AudioType } from "@/lib/stores/audio.store";
 
 const inputStyles = cn(
@@ -99,6 +98,8 @@ export const NewTimerDrawer: Component<PropsWithChildren & {
             <p className="text-muted-foreground text-xs text-center">Click outside the drawer to cancel.</p>
             <Button size={"sm"}
               onClick={() => {
+                if (Number(hours) === 0 && Number(minutes) === 0 && Number(seconds) === 0) return;
+
                 const startTimestamp = dayJS().valueOf();
                 let endTimestamp = dayJS(startTimestamp);
                 if (Number(hours) !== 0) {
@@ -138,6 +139,9 @@ export const NewTimerDrawer: Component<PropsWithChildren & {
 
                 setIsDrawerOpen(false);
               }}
+              disabled={
+                Number(hours) === 0 && Number(minutes) === 0 && Number(seconds) === 0
+              }
             >
               Submit
             </Button>
