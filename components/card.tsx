@@ -34,6 +34,20 @@ export const TimerCard: Component<Timer & {
   const [pourcentage, setPourcentage] = useState<number>((timeLeft / (dayJS(endAt).diff(dayJS(startAt), "seconds")) * 100));
 
   useEffect(() => {
+    if ('Notification' in window) {
+      if (Notification.permission === 'granted') {
+        new Notification('Awesome! You will now receive notifications');
+      } else if (Notification.permission !== 'denied') {
+        Notification.requestPermission().then(permission => {
+          if (permission === 'granted') {
+            new Notification('Awesome! You will now receive notifications');
+          }
+        });
+      }
+    }
+  }, []);
+  
+  useEffect(() => {
     if (timeLeft <= 0) {
       toggleEnd(id);
       togglePlay(song);
