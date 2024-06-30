@@ -42,13 +42,15 @@ export const NewTimerDrawer: Component<PropsWithChildren & {
   const [timerName, setTimerName] = useState<string>("");
   const [song, setSong] = useState<AudioType["song"]>("drums");
 
+  const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
+
   return (
     <Drawer onClose={() => {
       setHours("00");
       setMinutes("00");
       setSeconds("00");
       setTimerName("");
-    }}>
+    }} open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
       <DrawerTrigger asChild>
         {isCard ? children : (
           <Button>Create Timer</Button>
@@ -75,17 +77,17 @@ export const NewTimerDrawer: Component<PropsWithChildren & {
             </div>
 
             <div className="flex justify-center space-x-2">
-              <Input placeholder="00" value={hours} max={24}
+              <Input placeholder="00" type="number" value={hours} max={24}
                 onChange={(e) => setHours(numberFormat(e.target.value, 24))}
                 className={inputStyles}
               />
 
-              <Input placeholder="00" value={minutes} max={60}
+              <Input placeholder="00" type="number" value={minutes} max={60}
                 onChange={(e) => setMinutes(numberFormat(e.target.value ?? 0, 59))}
                 className={inputStyles}
               />
 
-              <Input placeholder="00" value={seconds} max={60}
+              <Input placeholder="00" type="number" value={seconds} max={60}
                 onChange={(e) => setSeconds(numberFormat(e.target.value ?? 0, 59))}
                 className={inputStyles}
               />
@@ -133,6 +135,8 @@ export const NewTimerDrawer: Component<PropsWithChildren & {
                 setMinutes("00");
                 setSeconds("00");
                 setTimerName("");
+
+                setIsDrawerOpen(false);
               }}
             >
               Submit
